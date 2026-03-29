@@ -26,7 +26,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
-// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface SerializedPayment {
 	_id: string;
@@ -61,7 +60,6 @@ interface CheckoutClientProps {
 type VerifyResult = "completed" | "needs_review" | "already_completed" | null;
 type UploadStep = "idle" | "reading" | "uploading" | "done";
 
-// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function formatBytes(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;
@@ -147,7 +145,6 @@ async function uploadScreenshotToCloudinary(
 	});
 }
 
-// â”€â”€â”€ Status Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function StatusBanner({
 	status,
@@ -216,7 +213,6 @@ function StatusBanner({
 	return null;
 }
 
-// â”€â”€â”€ Screenshot Upload Zone â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface UploadZoneProps {
 	onFileSelect: (file: File) => void;
@@ -328,7 +324,6 @@ function UploadZone({ onFileSelect, disabled }: UploadZoneProps) {
 	);
 }
 
-// â”€â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function CheckoutClient({
 	payment: initialPayment,
@@ -497,7 +492,6 @@ export function CheckoutClient({
 	const isNeedsReview = payment.payment_status === "needs_review";
 	const isPending = payment.payment_status === "pending";
 
-	// â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 	return (
 		<div className="min-h-screen bg-[#0a0a0a] text-white">
@@ -508,7 +502,6 @@ export function CheckoutClient({
 			</div>
 
 			<div className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 py-10">
-				{/* â”€â”€ Breadcrumb â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
 				<div className="flex items-center gap-2 text-xs text-gray-600 mb-8">
 					<a
 						href="/dashboard"
@@ -527,7 +520,6 @@ export function CheckoutClient({
 					<span className="text-gray-400 font-mono">Checkout</span>
 				</div>
 
-				{/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
 				<div className="mb-8">
 					<div className="flex items-center gap-3 mb-3">
 						<h1 className="text-3xl font-black tracking-tight">
@@ -569,7 +561,6 @@ export function CheckoutClient({
 					</p>
 				</div>
 
-				{/* â”€â”€ Status banners (completed / needs_review) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
 				{(isCompleted || isNeedsReview) && (
 					<div className="mb-6">
 						<StatusBanner status={payment.payment_status} />
@@ -585,9 +576,7 @@ export function CheckoutClient({
 					</div>
 				)}
 
-				{/* â”€â”€ Main card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
 				<div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] overflow-hidden">
-					{/* â”€â”€ Order summary header â”€â”€ */}
 					<div className="px-6 py-5 border-b border-white/[0.06] bg-gradient-to-r from-[#FF1B6B]/5 to-transparent">
 						<div className="flex items-start justify-between gap-4 flex-wrap">
 							<div>
@@ -647,7 +636,6 @@ export function CheckoutClient({
 						</div>
 					</div>
 
-					{/* â”€â”€ QR Code section â”€â”€ */}
 					<div className="px-6 py-6 border-b border-white/[0.06]">
 						<div className="flex flex-col sm:flex-row items-center gap-6">
 							{/* QR code */}
@@ -763,7 +751,6 @@ export function CheckoutClient({
 						</div>
 					</div>
 
-					{/* â”€â”€ Screenshot Upload section â”€â”€ */}
 					{!isCompleted && (
 						<div className="px-6 py-6">
 							<div className="flex items-center justify-between mb-4">
@@ -958,7 +945,6 @@ export function CheckoutClient({
 						</div>
 					)}
 
-					{/* â”€â”€ Completed state bottom section â”€â”€ */}
 					{isCompleted && (
 						<div className="px-6 py-6">
 							<div className="flex flex-col items-center text-center gap-4">
@@ -1000,7 +986,6 @@ export function CheckoutClient({
 					)}
 				</div>
 
-				{/* â”€â”€ Bottom security note â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
 				<div className="mt-6 rounded-xl border border-white/[0.05] bg-white/[0.015] px-5 py-3.5 flex items-start gap-3">
 					<Shield className="h-4 w-4 text-gray-600 shrink-0 mt-0.5" />
 					<p className="text-xs text-gray-700 leading-relaxed">

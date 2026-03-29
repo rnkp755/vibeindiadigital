@@ -1,4 +1,4 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
+﻿import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Payment from "@/models/Payment";
@@ -8,7 +8,7 @@ import Order from "@/models/Order";
 
 export const dynamic = "force-dynamic";
 
-// ─── GET /api/payments/[token] ────────────────────────────────────────────────
+// GET /api/payments/[token]
 // Returns the full details of a payment by its token.
 // The requesting user must be the owner of the payment OR an admin.
 
@@ -30,7 +30,6 @@ export async function GET(
     );
   }
 
-  // ── DB lookup ──────────────────────────────────────────────────────────────
   try {
     await connectToDatabase();
   } catch (err) {
@@ -52,8 +51,7 @@ export async function GET(
     );
   }
 
-  // ── Ownership check ────────────────────────────────────────────────────────
-  // Resolve the Clerk user's email and check against payment.email.
+  // Ownership check
   // Admins (role === "admin" in publicMetadata) can view any payment.
   let userEmail: string;
   let isAdmin = false;
@@ -84,7 +82,7 @@ export async function GET(
     );
   }
 
-  // ── Shape the response ─────────────────────────────────────────────────────
+  // Shape the response
   // Never expose OCR text or screenshot URLs to regular users.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const safePayment: Record<string, any> = {
@@ -112,9 +110,9 @@ export async function GET(
   return NextResponse.json({ payment: safePayment });
 }
 
-// ─── PATCH /api/payments/[token] ──────────────────────────────────────────────
+// PATCH /api/payments/[token]
 // Admin-only: manually update the payment status.
-// Used by admin dashboard to resolve "needs_review" payments.
+// Used by admin dashboard to resolve payments.
 
 export async function PATCH(
   req: Request,
@@ -125,7 +123,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // ── Verify admin role ──────────────────────────────────────────────────────
+  // Verify admin role
   try {
     const client = await clerkClient();
     const clerkUser = await client.users.getUser(userId);
@@ -154,7 +152,13 @@ export async function PATCH(
   }
 
   const { payment_status } = body;
-  const allowedStatuses = ["pending", "needs_review", "completed", "verified", "failed"];
+  const allowedStatuses = [
+    "pending",
+    "needs_review",
+    "completed",
+    "verified",
+    "failed",
+  ];
 
   if (!payment_status || !allowedStatuses.includes(payment_status)) {
     return NextResponse.json(
@@ -178,14 +182,18 @@ export async function PATCH(
   const payment = await Payment.findOne({ token: token.trim() });
 
   if (!payment) {
-    return NextResponse.json(
-      { error: "Payment not found." },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Payment not found." }, { status: 404 });
   }
 
-  // ── If marking as completed, credit the user ───────────────────────────────
-  if (payment_status === "completed" && payment.payment_status !== "completed") {
+  // If marking as completed or verified, credit the user
+  const shouldCredit =
+    (payment_status === "completed" &&
+      payment.payment_status !== "completed") ||
+    (payment_status === "verified" &&
+      payment.payment_status !== "verified" &&
+      payment.payment_status !== "completed");
+
+  if (shouldCredit) {
     try {
       const client = await clerkClient();
 
@@ -230,11 +238,12 @@ export async function PATCH(
     }
   }
 
-  // â”€â”€ If marking as failed, rollback credits and unpaid orders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // If marking as failed, rollback credits and unpaid orders
   if (
     payment_status === "failed" &&
     payment.payment_status !== "failed" &&
-    (payment.payment_status === "completed" || payment.payment_status === "verified")
+    (payment.payment_status === "completed" ||
+      payment.payment_status === "verified")
   ) {
     try {
       const client = await clerkClient();
@@ -301,7 +310,12 @@ export async function PATCH(
     }
   }
 
-  payment.payment_status = payment_status as "pending" | "needs_review" | "completed" | "verified" | "failed";
+  payment.payment_status = payment_status as
+    | "pending"
+    | "needs_review"
+    | "completed"
+    | "verified"
+    | "failed";
   await payment.save();
 
   return NextResponse.json({

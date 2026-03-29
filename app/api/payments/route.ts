@@ -248,8 +248,6 @@ export async function POST(req: Request) {
 	return NextResponse.json(
 		{
 			payment: {
-				_id: paymentDoc._id,
-				_id: paymentDoc._id,
 				token: paymentDoc.token,
 				amount: paymentDoc.amount,
 				original_amount: plan.amount,

@@ -1,6 +1,5 @@
 import nodemailer from "nodemailer";
 
-
 const SMTP_USER = process.env.SMTP_USER;
 const GOOGLE_APP_PASSWORD = process.env.GOOGLE_APP_PASSWORD;
 
@@ -11,61 +10,59 @@ const ADMIN = process.env.ADMIN_EMAIL ?? "admin@vibeindia.digital";
 let cachedTransporter: nodemailer.Transporter | null = null;
 
 function getTransporter() {
-  if (cachedTransporter) return cachedTransporter;
+	if (cachedTransporter) return cachedTransporter;
 
-  if (!SMTP_USER || !GOOGLE_APP_PASSWORD) {
-    throw new Error(
-      "Missing SMTP credentials. Set SMTP_USER and GOOGLE_APP_PASSWORD in the environment."
-    );
-  }
+	if (!SMTP_USER || !GOOGLE_APP_PASSWORD) {
+		throw new Error(
+			"Missing SMTP credentials. Set SMTP_USER and GOOGLE_APP_PASSWORD in the environment.",
+		);
+	}
 
-  cachedTransporter = nodemailer.createTransport({
+	cachedTransporter = nodemailer.createTransport({
 		service: process.env.SMTP_SERVICE,
 		auth: {
 			user: process.env.SMTP_USER,
 			pass: process.env.GOOGLE_APP_PASSWORD, // The 16-character App Password
 		},
-  });
+	});
 
-  return cachedTransporter;
+	return cachedTransporter;
 }
 
-// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface SupportEmailPayload {
-  orderId: string;
-  userEmail: string;
-  userName: string;
-  message: string;
+	orderId: string;
+	userEmail: string;
+	userName: string;
+	message: string;
 }
 
 export interface PaymentReviewEmailPayload {
-  token: string;
-  userEmail: string;
-  planName: string;
-  amount: number;
-  extractedText: string;
-  screenshotUrl?: string; // Cloudinary URL if uploaded
+	token: string;
+	userEmail: string;
+	planName: string;
+	amount: number;
+	extractedText: string;
+	screenshotUrl?: string; // Cloudinary URL if uploaded
 }
 
 export interface PaymentConfirmedEmailPayload {
-  userEmail: string;
-  userName: string;
-  planName: string;
-  credits: number;
-  amount: number;
-  token: string;
+	userEmail: string;
+	userName: string;
+	planName: string;
+	credits: number;
+	amount: number;
+	token: string;
 }
 
 export interface WelcomeEmailPayload {
-  email: string;
-  firstName?: string;
+	email: string;
+	firstName?: string;
 }
 
-// â”€â”€â”€ Templates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function baseWrapper(content: string): string {
-  return `
+	return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -123,11 +120,11 @@ function baseWrapper(content: string): string {
 }
 
 function badge(text: string, color = "#FF1B6B"): string {
-  return `<span style="display:inline-block;background:${color}22;color:${color};border:1px solid ${color}44;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:0.5px;">${text}</span>`;
+	return `<span style="display:inline-block;background:${color}22;color:${color};border:1px solid ${color}44;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:0.5px;">${text}</span>`;
 }
 
 function infoRow(label: string, value: string): string {
-  return `
+	return `
     <tr>
       <td style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
         <span style="color:#888888;font-size:13px;">${label}</span>
@@ -139,16 +136,15 @@ function infoRow(label: string, value: string): string {
   `;
 }
 
-// â”€â”€â”€ Email Senders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Sends a support email from a user about their order.
  * Goes to admin/support inbox.
  */
 export async function sendSupportEmail(payload: SupportEmailPayload) {
-  const { orderId, userEmail, userName, message } = payload;
+	const { orderId, userEmail, userName, message } = payload;
 
-  const html = baseWrapper(`
+	const html = baseWrapper(`
     <h2 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#ffffff;">
       New Support Request
     </h2>
@@ -176,24 +172,26 @@ export async function sendSupportEmail(payload: SupportEmailPayload) {
     </div>
   `);
 
-  const transporter = getTransporter();
-  return transporter.sendMail({
-    from: FROM,
-    to: ADMIN,
-    replyTo: userEmail,
-    subject: `[Support] Order #${orderId} â€” ${userName}`,
-    html,
-  });
+	const transporter = getTransporter();
+	return transporter.sendMail({
+		from: FROM,
+		to: ADMIN,
+		replyTo: userEmail,
+		subject: `[Support] Order #${orderId} - ” ${userName}`,
+		html,
+	});
 }
 
 /**
  * Sends an email to admin when a payment needs review (OCR mismatch / token not found).
  */
-export async function sendPaymentReviewEmail(payload: PaymentReviewEmailPayload) {
-  const { token, userEmail, planName, amount, extractedText, screenshotUrl } =
-    payload;
+export async function sendPaymentReviewEmail(
+	payload: PaymentReviewEmailPayload,
+) {
+	const { token, userEmail, planName, amount, extractedText, screenshotUrl } =
+		payload;
 
-  const html = baseWrapper(`
+	const html = baseWrapper(`
     <h2 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#ffffff;">
       ${badge("Needs Review", "#F59E0B")} Payment Requires Manual Review
     </h2>
@@ -205,7 +203,7 @@ export async function sendPaymentReviewEmail(payload: PaymentReviewEmailPayload)
       ${infoRow("Token", token)}
       ${infoRow("User Email", userEmail)}
       ${infoRow("Plan", planName)}
-      ${infoRow("Expected Amount", `â‚¹${amount.toFixed(2)}`)}
+      ${infoRow("Expected Amount", `₹${amount.toFixed(2)}`)}
     </table>
 
     <p style="margin:0 0 8px;font-size:13px;color:#888888;font-weight:500;text-transform:uppercase;letter-spacing:1px;">
@@ -213,14 +211,14 @@ export async function sendPaymentReviewEmail(payload: PaymentReviewEmailPayload)
     </p>
     <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px;margin-bottom:24px;max-height:200px;overflow:auto;">
       <pre style="margin:0;font-size:12px;color:#cccccc;line-height:1.6;white-space:pre-wrap;font-family:monospace;">${extractedText.slice(
-        0,
-        2000
-      )}</pre>
+			0,
+			2000,
+		)}</pre>
     </div>
 
     ${
-      screenshotUrl
-        ? `
+		screenshotUrl
+			? `
     <p style="margin:0 0 8px;font-size:13px;color:#888888;font-weight:500;text-transform:uppercase;letter-spacing:1px;">
       Screenshot
     </p>
@@ -230,8 +228,8 @@ export async function sendPaymentReviewEmail(payload: PaymentReviewEmailPayload)
       </a>
     </div>
     `
-        : ""
-    }
+			: ""
+	}
 
     <div style="margin-top:8px;">
       <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/payments" style="display:inline-block;background:#FF1B6B;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">
@@ -240,24 +238,24 @@ export async function sendPaymentReviewEmail(payload: PaymentReviewEmailPayload)
     </div>
   `);
 
-  const transporter = getTransporter();
-  return transporter.sendMail({
-    from: FROM,
-    to: ADMIN,
-    subject: `[Payment Review] Token ${token} â€” ${userEmail}`,
-    html,
-  });
+	const transporter = getTransporter();
+	return transporter.sendMail({
+		from: FROM,
+		to: ADMIN,
+		subject: `[Payment Review] Token ${token} — ${userEmail}`,
+		html,
+	});
 }
 
 /**
  * Sends a confirmation email to user when their payment is successfully verified.
  */
 export async function sendPaymentConfirmedEmail(
-  payload: PaymentConfirmedEmailPayload
+	payload: PaymentConfirmedEmailPayload,
 ) {
-  const { userEmail, userName, planName, credits, amount, token } = payload;
+	const { userEmail, userName, planName, credits, amount, token } = payload;
 
-  const html = baseWrapper(`
+	const html = baseWrapper(`
     <h2 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#ffffff;">
       ${badge("Payment Confirmed", "#10B981")} Your Credits Are Ready!
     </h2>
@@ -274,7 +272,7 @@ export async function sendPaymentConfirmedEmail(
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
       ${infoRow("Transaction Token", token)}
       ${infoRow("Plan", planName)}
-      ${infoRow("Amount Paid", `â‚¹${amount.toFixed(2)}`)}
+      ${infoRow("Amount Paid", `₹${amount.toFixed(2)}`)}
       ${infoRow("Credits Added", credits.toString())}
     </table>
 
@@ -283,27 +281,27 @@ export async function sendPaymentConfirmedEmail(
     </p>
 
     <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/create-order" style="display:inline-block;background:#FF1B6B;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:600;">
-      Start Distributing â†’
+      Start Distributing
     </a>
   `);
 
-  const transporter = getTransporter();
-  return transporter.sendMail({
-    from: FROM,
-    to: userEmail,
-    subject: `âœ… Payment Confirmed â€” ${credits} Credits Added (${planName} Plan)`,
-    html,
-  });
+	const transporter = getTransporter();
+	return transporter.sendMail({
+		from: FROM,
+		to: userEmail,
+		subject: `Payment Confirmed — ${credits} Credits Added (${planName} Plan)`,
+		html,
+	});
 }
 
 /**
  * Sends a welcome email to a newly registered user.
  */
 export async function sendWelcomeEmail(payload: WelcomeEmailPayload) {
-  const { email, firstName } = payload;
-  const name = firstName ?? email.split("@")[0];
+	const { email, firstName } = payload;
+	const name = firstName ?? email.split("@")[0];
 
-  const html = baseWrapper(`
+	const html = baseWrapper(`
     <h2 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#ffffff;">
       Welcome to VibeIndia! ðŸŽµ
     </h2>
@@ -319,7 +317,7 @@ export async function sendWelcomeEmail(payload: WelcomeEmailPayload) {
             <span style="display:inline-block;width:22px;height:22px;background:#FF1B6B;border-radius:50%;text-align:center;line-height:22px;font-size:12px;font-weight:700;color:#fff;">1</span>
           </td>
           <td style="padding:8px 0 8px 10px;">
-            <span style="color:#dddddd;font-size:14px;line-height:1.5;">Buy Credits â€” choose a plan that suits your release needs</span>
+            <span style="color:#dddddd;font-size:14px;line-height:1.5;">Buy Credits choose a plan that suits your release needs</span>
           </td>
         </tr>
         <tr>
@@ -327,7 +325,7 @@ export async function sendWelcomeEmail(payload: WelcomeEmailPayload) {
             <span style="display:inline-block;width:22px;height:22px;background:#FF1B6B;border-radius:50%;text-align:center;line-height:22px;font-size:12px;font-weight:700;color:#fff;">2</span>
           </td>
           <td style="padding:8px 0 8px 10px;">
-            <span style="color:#dddddd;font-size:14px;line-height:1.5;">Create an Order â€” upload your tracks and fill in your release details</span>
+            <span style="color:#dddddd;font-size:14px;line-height:1.5;">Create an Order upload your tracks and fill in your release details</span>
           </td>
         </tr>
         <tr>
@@ -335,22 +333,22 @@ export async function sendWelcomeEmail(payload: WelcomeEmailPayload) {
             <span style="display:inline-block;width:22px;height:22px;background:#FF1B6B;border-radius:50%;text-align:center;line-height:22px;font-size:12px;font-weight:700;color:#fff;">3</span>
           </td>
           <td style="padding:8px 0 8px 10px;">
-            <span style="color:#dddddd;font-size:14px;line-height:1.5;">Track Progress â€” monitor your distribution status in real time</span>
+            <span style="color:#dddddd;font-size:14px;line-height:1.5;">Track Progress monitor your distribution status in real time</span>
           </td>
         </tr>
       </table>
     </div>
 
     <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="display:inline-block;background:#FF1B6B;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:600;">
-      Go to Dashboard â†’
+      Go to Dashboard
     </a>
   `);
 
-  const transporter = getTransporter();
-  return transporter.sendMail({
-    from: FROM,
-    to: email,
-    subject: `Welcome to VibeIndia Digital, ${name}! ðŸŽµ`,
-    html,
-  });
+	const transporter = getTransporter();
+	return transporter.sendMail({
+		from: FROM,
+		to: email,
+		subject: `Welcome to VibeIndia Digital, ${name}! ðŸŽµ`,
+		html,
+	});
 }

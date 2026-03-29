@@ -71,7 +71,12 @@ function extractAmounts(text: string): number[] {
     }
   }
 
-  return [...new Set(found)]; // deduplicate
+  // Deduplicate without relying on Set iteration (TS downlevel issue)
+  const unique: number[] = [];
+  for (const value of found) {
+    if (!unique.includes(value)) unique.push(value);
+  }
+  return unique;
 }
 
 /**

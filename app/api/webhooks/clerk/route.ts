@@ -41,21 +41,27 @@ export async function POST(req: Request) {
 
   // ── Handle events ──────────────────────────────────────────────────────────
   if (evt.type === "user.created") {
-    const {
-      id: userId,
-      email_addresses,
-      first_name,
-      public_metadata,
-    } = evt.data;
+    const userData = evt.data as {
+      id: string;
+      email_addresses: { id: string; email_address: string }[];
+      first_name?: string | null;
+      public_metadata?: { role?: string };
+      primary_email_address_id?: string | null;
+    };
+
+    const { id: userId, email_addresses, first_name, public_metadata } =
+      userData;
 
     // Only set metadata if it hasn't been set already (idempotency guard)
     if (public_metadata?.role) {
       return new Response("Metadata already set", { status: 200 });
     }
 
+    const primaryEmailId = userData.primary_email_address_id ?? undefined;
     const primaryEmail =
-      email_addresses.find((e) => e.id === evt.data.primary_email_address_id)
-        ?.email_address ?? email_addresses[0]?.email_address;
+      (primaryEmailId
+        ? email_addresses.find((e) => e.id === primaryEmailId)?.email_address
+        : undefined) ?? email_addresses[0]?.email_address;
 
     try {
       const client = await clerkClient();

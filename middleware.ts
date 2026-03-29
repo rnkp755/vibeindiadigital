@@ -32,9 +32,14 @@ export default clerkMiddleware(async (auth, req) => {
 
   // Guard admin routes
   if (isAdminRoute(req)) {
-    const role = (sessionClaims?.publicMetadata as { role?: string })?.role;
-    if (role !== "admin") {
-      // Redirect non-admins to dashboard
+    const role =
+      (sessionClaims?.publicMetadata as { role?: string } | undefined)?.role ??
+      (sessionClaims?.metadata as { role?: string } | undefined)?.role ??
+      (sessionClaims?.public_metadata as { role?: string } | undefined)?.role;
+
+    // If role is present and not admin, block here.
+    // If role is missing from session claims, allow through and let server checks handle it.
+    if (role && role !== "admin") {
       const dashboardUrl = new URL("/dashboard", req.url);
       return NextResponse.redirect(dashboardUrl);
     }

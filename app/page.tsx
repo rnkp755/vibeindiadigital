@@ -27,9 +27,10 @@ import {
   LayoutDashboard,
   LogIn,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import {
   Accordion,
   AccordionContent,
@@ -40,6 +41,17 @@ import {
 export default function Home() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const { isSignedIn, isLoaded } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.replace("/dashboard");
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  if (isLoaded && isSignedIn) {
+    return null;
+  }
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white cursor-none">

@@ -30,10 +30,16 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { AdminPaymentActions } from "@/components/admin/AdminPaymentActions";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-type PaymentStatus = "pending" | "needs_review" | "completed";
+type PaymentStatus =
+  | "pending"
+  | "needs_review"
+  | "completed"
+  | "verified"
+  | "failed";
 
 interface PageProps {
   searchParams: {
@@ -79,6 +85,18 @@ const STATUS_CONFIG: Record<
     chipClass: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
     dotClass: "bg-emerald-400",
     icon: CheckCircle2,
+  },
+  verified: {
+    label: "Verified",
+    chipClass: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
+    dotClass: "bg-emerald-300",
+    icon: ShieldCheck,
+  },
+  failed: {
+    label: "Failed",
+    chipClass: "border-red-500/30 bg-red-500/10 text-red-400",
+    dotClass: "bg-red-400",
+    icon: XCircle,
   },
 };
 
@@ -189,6 +207,8 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
     "pending",
     "needs_review",
     "completed",
+    "verified",
+    "failed",
   ];
   if (statusFilter && allowedStatuses.includes(statusFilter as PaymentStatus)) {
     filter.payment_status = statusFilter;
@@ -429,6 +449,8 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
               <option value="pending">Pending</option>
               <option value="needs_review">Needs Review</option>
               <option value="completed">Completed</option>
+              <option value="verified">Verified</option>
+              <option value="failed">Failed</option>
             </select>
           </div>
 
@@ -526,7 +548,7 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
         )}
 
         {/* ── Payments table ──────────────────────────────────────────────────── */}
-        <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] overflow-hidden">
+        <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] overflow-visible">
           {/* Table header — desktop only */}
           <div className="hidden xl:grid grid-cols-[1fr_auto_auto_auto_auto_auto_auto] gap-4 px-5 py-3 border-b border-white/[0.06] bg-white/[0.02]">
             {[
@@ -657,18 +679,22 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
 
                       {/* OCR text */}
                       {payment.ocr_extracted_text && (
-                        <details className="group/ocr">
-                          <summary className="text-xs text-gray-600 hover:text-gray-400 cursor-pointer select-none list-none flex items-center gap-1">
-                            <span className="border-b border-dashed border-gray-700">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className="text-xs text-gray-600 hover:text-gray-400 cursor-pointer select-none border-b border-dashed border-gray-700">
                               View OCR text
-                            </span>
-                          </summary>
-                          <div className="mt-2 rounded-lg border border-white/8 bg-white/[0.02] p-3 max-h-32 overflow-y-auto">
-                            <pre className="text-[11px] text-gray-500 whitespace-pre-wrap font-mono leading-relaxed">
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            side="bottom"
+                            align="start"
+                            className="w-80 max-h-40 overflow-auto rounded-xl border border-white/10 bg-[#111111] p-3 shadow-2xl ocr-scroll"
+                          >
+                            <pre className="text-[11px] text-gray-400 whitespace-pre-wrap font-mono leading-relaxed">
                               {payment.ocr_extracted_text.slice(0, 800)}
                             </pre>
-                          </div>
-                        </details>
+                          </PopoverContent>
+                        </Popover>
                       )}
 
                       {/* Actions */}
@@ -709,16 +735,22 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
                             </a>
                           )}
                           {payment.ocr_extracted_text && (
-                            <details className="relative group/ocr">
-                              <summary className="text-[11px] text-gray-600 hover:text-gray-400 cursor-pointer select-none list-none border-b border-dashed border-gray-700">
-                                OCR text
-                              </summary>
-                              <div className="absolute top-5 left-0 z-20 w-80 rounded-xl border border-white/10 bg-[#111111] shadow-2xl p-3 max-h-48 overflow-y-auto">
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button className="text-[11px] text-gray-600 hover:text-gray-400 cursor-pointer select-none border-b border-dashed border-gray-700">
+                                  OCR text
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                side="bottom"
+                                align="start"
+                                className="w-80 max-h-48 overflow-auto rounded-xl border border-white/10 bg-[#111111] p-3 shadow-2xl ocr-scroll"
+                              >
                                 <pre className="text-[11px] text-gray-400 whitespace-pre-wrap font-mono leading-relaxed">
                                   {payment.ocr_extracted_text.slice(0, 1000)}
                                 </pre>
-                              </div>
-                            </details>
+                              </PopoverContent>
+                            </Popover>
                           )}
                         </div>
                       </div>
