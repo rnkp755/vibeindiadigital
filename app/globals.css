@@ -84,6 +84,7 @@
     scroll-behavior: smooth;
   }
   body {
+    cursor: none;
     @apply bg-background text-foreground;
     font-family: var(--font-body);
     background:
