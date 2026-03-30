@@ -1,45 +1,136 @@
 "use client";
 
-import { CustomCursor } from "@/components/custom-cursor";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Music,
-  Check,
-  Play,
-  TrendingUp,
-  DollarSign,
-  ChartBar as BarChart3,
-  Globe,
-  Shield,
-  Zap,
-  Users,
-  Headphones as HeadphonesIcon,
-  ChevronRight,
-  Music2,
-  Radio,
-  Disc3,
-  Crown,
-  Star,
-  Calendar,
-  FileText,
-  MessageSquare,
-  LayoutDashboard,
-  LogIn,
-} from "lucide-react";
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Check,
+  ChevronRight,
+  Disc3,
+  Headphones,
+  LayoutDashboard,
+  LogIn,
+  Music2,
+  Play,
+  ShieldCheck,
+  Sparkles,
+  Upload,
+  Wallet,
+  Waves,
+} from "lucide-react";
+
+import { CustomCursor } from "@/components/custom-cursor";
+import { Button } from "@/components/ui/button";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { cn } from "@/lib/utils";
+
+const platformLogos = [
+  "Spotify",
+  "Apple Music",
+  "YouTube Music",
+  "Instagram",
+  "TikTok",
+  "JioSaavn",
+  "Amazon Music",
+  "Gaana",
+];
+
+const releaseSteps = [
+  {
+    step: "01",
+    title: "Sign in and start a release request",
+    copy:
+      "Create your account, open a release order, and move straight into the upload flow without hunting for the next step.",
+    icon: LogIn,
+  },
+  {
+    step: "02",
+    title: "Upload masters and cover art",
+    copy:
+      "Bring your WAV files, artwork, and release assets together in one place so the submission stays clean from the start.",
+    icon: Upload,
+  },
+  {
+    step: "03",
+    title: "Pay once and lock the drop",
+    copy:
+      "Choose the right plan, pay a one-time fee, and keep control of your catalog without subscription anxiety.",
+    icon: Wallet,
+  },
+  {
+    step: "04",
+    title: "Track status until it goes live",
+    copy:
+      "Watch the release move through review, payment, and delivery stages so you always know what is happening next.",
+    icon: LayoutDashboard,
+  },
+];
+
+const advantageColumns = [
+  {
+    eyebrow: "For creators",
+    title: "Designed for people distributing a message, not filling a spreadsheet.",
+    points: [
+      "Direct release language instead of platform jargon",
+      "Clear states around upload, payment, and approval",
+      "Support framed around shipping the release, not filing tickets",
+    ],
+  },
+  {
+    eyebrow: "For momentum",
+    title: "Microinteractions that feel musical without slowing the work down.",
+    points: [
+      "Fast hover and press feedback with reduced-motion fallbacks",
+      "Color used as a signal for energy, readiness, and progress",
+      "Visual rhythm that feels more editorial than templated",
+    ],
+  },
+];
+
+const statusNotes = [
+  { label: "Masters checked", value: "2 WAV + 2 covers ready", tone: "ready" },
+  { label: "Payment", value: "Pending confirmation", tone: "pending" },
+  { label: "Distribution", value: "Queued for platform delivery", tone: "active" },
+];
+
+const faqs = [
+  {
+    q: "How fast can my release move after payment?",
+    a: "Most releases can be prepared for delivery within 24 to 48 hours after the assets and payment are confirmed. Some stores can take longer to publish.",
+  },
+  {
+    q: "Do I keep my rights?",
+    a: "Yes. The platform is built around distribution, not ownership transfer. You keep control of your music and artwork.",
+  },
+  {
+    q: "What do I need before I start?",
+    a: "Prepare WAV masters, square cover art, release details, and the payout information you want tied to the order. The create-order flow is designed around exactly that set.",
+  },
+  {
+    q: "Can I track where my release is stuck?",
+    a: "Yes. The workflow is meant to make status visible so artists can see whether the order is waiting on upload checks, payment, review, or distribution.",
+  },
+];
+
+function Surface({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return <div className={cn("surface-panel rounded-[28px]", className)}>{children}</div>;
+}
 
 export default function Home() {
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const { isSignedIn, isLoaded } = useAuth();
   const router = useRouter();
 
@@ -54,639 +145,412 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white cursor-none">
+    <main className="min-h-screen cursor-none overflow-x-hidden text-white">
       <CustomCursor />
 
-      <nav className="fixed top-0 w-full z-50 bg-[#0a0a0a]/80 backdrop-blur-lg border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <Music2 className="h-8 w-8 text-[#FF1B6B] group-hover:scale-110 transition-transform" />
-            <span className="text-xl font-bold">
-              Vibe<span className="text-[#FF1B6B]">India</span>
-            </span>
-            <span className="text-[10px] font-semibold text-[#FF1B6B]/70 bg-[#FF1B6B]/10 border border-[#FF1B6B]/20 px-1.5 py-0.5 rounded-full hidden sm:inline">
-              Digital
-            </span>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="hero-grid absolute inset-x-0 top-0 h-[720px] opacity-25" />
+        <div className="float-drift absolute left-[6%] top-28 h-40 w-40 rounded-full bg-[#ff1b6b]/14 blur-3xl" />
+        <div className="float-drift-delay absolute right-[10%] top-40 h-48 w-48 rounded-full bg-[#ff914d]/12 blur-3xl" />
+        <div className="absolute inset-x-0 top-[34rem] h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      </div>
+
+      <nav className="sticky top-0 z-50 border-b border-white/6 bg-[#0b0712]/70 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-6 lg:px-8">
+          <Link href="/" className="group flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
+              <Waves className="h-5 w-5 text-[#ff1b6b] transition-transform duration-200 group-hover:scale-110" />
+            </div>
+            <div>
+              <div
+                className="text-lg font-bold tracking-[-0.04em]"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                VibeIndia Digital
+              </div>
+              <div className="text-xs uppercase tracking-[0.28em] text-[#a7a0ba]">
+                Release distribution
+              </div>
+            </div>
           </Link>
-          <div className="hidden md:flex items-center gap-8">
-            <a
-              href="#features"
-              className="text-sm hover:text-[#FF1B6B] transition-colors"
-            >
-              Features
+
+          <div className="hidden items-center gap-8 text-sm text-[#bfb8d3] md:flex">
+            <a href="#flow" className="hover:text-white">
+              Flow
             </a>
-            <a
-              href="#pricing"
-              className="text-sm hover:text-[#FF1B6B] transition-colors"
-            >
-              Pricing
+            <a href="#why-us" className="hover:text-white">
+              Why us
             </a>
-            <a
-              href="#faq"
-              className="text-sm hover:text-[#FF1B6B] transition-colors"
-            >
+            <a href="#faq" className="hover:text-white">
               FAQ
             </a>
-            <a
-              href="#support"
-              className="text-sm hover:text-[#FF1B6B] transition-colors"
-            >
-              Support
-            </a>
           </div>
+
           <div className="flex items-center gap-3">
-            {!isLoaded ? (
-              /* Skeleton while Clerk loads */
-              <div className="flex items-center gap-3">
-                <div className="w-20 h-9 rounded-lg bg-white/5 animate-pulse" />
-                <div className="w-28 h-9 rounded-lg bg-white/8 animate-pulse" />
-              </div>
-            ) : isSignedIn ? (
-              /* Signed-in state */
-              <Link href="/dashboard">
-                <Button className="bg-[#FF1B6B] hover:bg-[#FF1B6B]/90 text-white font-semibold shadow-lg shadow-[#FF1B6B]/20 group">
-                  <LayoutDashboard className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
-                  Dashboard
-                  <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
-                </Button>
+            <Button asChild variant="outline" className="border-white/12 bg-white/5 text-white hover:bg-white/10">
+              <Link href="/sign-in">
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign in
               </Link>
-            ) : (
-              /* Signed-out state */
-              <>
-                <Link href="/sign-in">
-                  <Button
-                    variant="outline"
-                    className="border-white/15 text-gray-300 hover:text-white hover:border-white/30 bg-transparent group"
-                  >
-                    <LogIn className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/sign-up">
-                  <Button className="bg-[#FF1B6B] hover:bg-[#FF1B6B]/90 text-white font-semibold shadow-lg shadow-[#FF1B6B]/20 group">
-                    Get Started
-                    <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
-                  </Button>
-                </Link>
-              </>
-            )}
+            </Button>
+            <Button
+              asChild
+              className="bg-[#ff1b6b] px-5 text-white shadow-[0_18px_40px_rgba(255,27,107,0.28)] hover:bg-[#ff1b6b]/92 hover:shadow-[0_22px_46px_rgba(255,27,107,0.34)]"
+            >
+              <Link href="/sign-up">
+                Start release
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </nav>
 
-      <section className="pt-32 pb-20 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FF1B6B]/10 to-transparent" />
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="inline-block mb-6">
-            <Music className="h-16 w-16 text-[#FF1B6B] animate-pulse" />
+      <section className="relative px-5 pb-20 pt-12 sm:px-6 lg:px-8 lg:pb-28 lg:pt-20">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.12fr_0.88fr] lg:items-end">
+          <div className="reveal-up" style={{ animationDelay: "60ms" }}>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs uppercase tracking-[0.24em] text-[#ffb48a]">
+              <Sparkles className="h-3.5 w-3.5 text-[#ff1b6b]" />
+              Dark mode only. Creator-first.
+            </div>
+
+            <h1 className="max-w-4xl text-[clamp(3.4rem,8vw,7rem)] font-bold leading-[0.95] tracking-[-0.06em] text-white">
+              Drop your next
+              <span className="block text-[#ff1b6b]">release with pulse.</span>
+            </h1>
+
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-[#c8c2d8] sm:text-xl">
+              VibeIndia Digital gives musicians, singers, and lyricists a clear path
+              from sign-in to upload, payment, and live distribution without making
+              the process feel corporate or flat.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+              <Button
+                asChild
+                size="lg"
+                className="h-14 bg-[#ff1b6b] px-7 text-base font-semibold text-white shadow-[0_20px_50px_rgba(255,27,107,0.3)] hover:-translate-y-0.5 hover:bg-[#ff1b6b]/92"
+              >
+                <Link href="/sign-up">
+                  Create your release order
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="h-14 border-white/12 bg-white/5 px-7 text-base text-white hover:-translate-y-0.5 hover:bg-white/10"
+              >
+                <Link href="/sign-in">
+                  <Play className="mr-2 h-4 w-4" />
+                  Go to sign in
+                </Link>
+              </Button>
+            </div>
+
+            <div className="mt-10 flex flex-wrap gap-3 text-sm text-[#d8d2e6]">
+              {[
+                "One-time payment",
+                "Upload assets once",
+                "Track release status",
+              ].map((item) => (
+                <span
+                  key={item}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2"
+                >
+                  <Check className="h-4 w-4 text-[#ff914d]" />
+                  {item}
+                </span>
+              ))}
+            </div>
           </div>
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-            Listen Music.
-            <br />
-            Your Favorites.
-            <br />
-            <span className="text-[#FF1B6B]">Your Vibe.</span>
-          </h1>
-          <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-            Distribute your music to all major streaming platforms. Keep 100% of
-            your rights. Pay once, distribute forever.
-          </p>
-          <div className="flex items-center justify-center gap-4">
-            <Button
-              size="lg"
-              className="bg-[#FF1B6B] hover:bg-[#FF1B6B]/90 text-white group"
-            >
-              Start Distributing
-              <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white/20 hover:border-[#FF1B6B] group"
-            >
-              <Play className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
-              Watch Demo
-            </Button>
-          </div>
-          <div className="mt-12 flex items-center justify-center gap-8 text-sm text-gray-500">
-            <span>100K+ Artists</span>
-            <span>•</span>
-            <span>50M+ Streams</span>
-            <span>•</span>
-            <span>150+ Platforms</span>
+
+          <div className="reveal-up" style={{ animationDelay: "180ms" }}>
+            <Surface className="relative overflow-hidden p-6 sm:p-7">
+              <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#ff1b6b]/18 to-transparent" />
+              <div className="relative">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.28em] text-[#a7a0ba]">
+                      Release cockpit
+                    </p>
+                    <h2 className="mt-2 text-2xl font-bold">Midnight Prayer EP</h2>
+                  </div>
+                  <span className="rounded-full border border-[#ff914d]/30 bg-[#ff914d]/10 px-3 py-1 text-xs font-medium text-[#ffd3b0]">
+                    3 steps complete
+                  </span>
+                </div>
+
+                <div className="mt-6 grid gap-3">
+                  {statusNotes.map((note, index) => (
+                    <div
+                      key={note.label}
+                      className="rounded-3xl border border-white/8 bg-black/20 p-4 reveal-up"
+                      style={{ animationDelay: `${260 + index * 70}ms` }}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-sm text-[#a7a0ba]">{note.label}</p>
+                          <p className="mt-1 text-sm font-medium text-white">
+                            {note.value}
+                          </p>
+                        </div>
+                        <span
+                          className={cn(
+                            "mt-1 h-2.5 w-2.5 rounded-full",
+                            note.tone === "ready" && "bg-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.45)]",
+                            note.tone === "pending" && "bg-[#ff914d] shadow-[0_0_20px_rgba(255,145,77,0.35)]",
+                            note.tone === "active" && "bg-[#ff1b6b] shadow-[0_0_20px_rgba(255,27,107,0.45)]"
+                          )}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 rounded-[24px] border border-white/8 bg-white/[0.03] p-5">
+                  <div className="flex items-center justify-between text-sm text-[#a7a0ba]">
+                    <span>What happens next</span>
+                    <span>Today</span>
+                  </div>
+                  <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                    {[
+                      { icon: Upload, title: "Asset review" },
+                      { icon: BadgeCheck, title: "Payment verify" },
+                      { icon: Music2, title: "Store delivery" },
+                    ].map((item) => (
+                      <div key={item.title} className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                        <item.icon className="h-5 w-5 text-[#ff1b6b]" />
+                        <p className="mt-3 text-sm font-medium text-white">
+                          {item.title}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Surface>
           </div>
         </div>
       </section>
 
-      <section className="py-20 px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Distribute <span className="text-[#FF1B6B]">Everywhere</span>
-          </h2>
-          <p className="text-gray-400 mb-12 max-w-2xl mx-auto">
-            Your music reaches every major platform automatically. One upload,
-            unlimited reach.
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            {[
-              "Spotify",
-              "Apple Music",
-              "YouTube",
-              "Amazon",
-              "Deezer",
-              "Tidal",
-              "Instagram",
-              "TikTok",
-              "Pandora",
-              "SoundCloud",
-              "Napster",
-              "iHeartRadio",
-            ].map((platform, i) => (
-              <Card
-                key={i}
-                className="bg-white/5 border-white/10 hover:border-[#FF1B6B] transition-all hover:scale-105"
-              >
-                <CardContent className="p-6 flex flex-col items-center justify-center h-24">
-                  <Globe className="h-8 w-8 text-[#FF1B6B] mb-2" />
-                  <span className="text-sm">{platform}</span>
-                </CardContent>
-              </Card>
-            ))}
+      <section className="px-5 pb-14 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="rounded-[30px] border border-white/8 bg-white/[0.03] px-6 py-5">
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-sm uppercase tracking-[0.22em] text-[#a7a0ba]">
+              <span className="text-white/80">Platforms in the release mix</span>
+              {platformLogos.map((platform) => (
+                <span key={platform} className="text-white/70 transition-colors hover:text-white">
+                  {platform}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      <section
-        id="pricing"
-        className="py-20 px-6 bg-gradient-to-b from-transparent to-[#FF1B6B]/5"
-      >
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Simple. <span className="text-[#FF1B6B]">One-Time Fee.</span>
-          </h2>
-          <p className="text-gray-400 mb-12 max-w-2xl mx-auto">
-            No subscriptions. No hidden fees. Pay once, distribute forever.
-          </p>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                name: "Single",
-                price: "₹499",
-                features: [
-                  "1 Track Distribution",
-                  "All Major Platforms",
-                  "Keep 100% Rights",
-                  "Basic Analytics",
-                  "Email Support",
-                ],
-              },
-              {
-                name: "EP",
-                price: "₹999",
-                features: [
-                  "Up to 5 Tracks",
-                  "All Major Platforms",
-                  "Keep 100% Rights",
-                  "Advanced Analytics",
-                  "Priority Support",
-                  "Custom Release Date",
-                ],
-                popular: true,
-              },
-              {
-                name: "Album",
-                price: "₹1,499",
-                features: [
-                  "Unlimited Tracks",
-                  "All Major Platforms",
-                  "Keep 100% Rights",
-                  "Pro Analytics",
-                  "Priority Support",
-                  "Custom Release Date",
-                  "Pre-Save Campaigns",
-                ],
-              },
-            ].map((plan, i) => (
-              <Card
-                key={i}
-                className={`relative bg-white/5 border-white/10 hover:border-[#FF1B6B] transition-all hover:scale-105 overflow-hidden group ${
-                  plan.popular ? "border-[#FF1B6B]" : ""
-                }`}
-                onMouseEnter={() => setHoveredCard(i)}
-                onMouseLeave={() => setHoveredCard(null)}
-              >
-                {plan.popular && (
-                  <div className="absolute top-0 right-0 bg-[#FF1B6B] text-white px-4 py-1 text-xs font-bold">
-                    POPULAR
+      <section id="flow" className="px-5 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr]">
+            <div className="lg:sticky lg:top-28 lg:self-start">
+              <p className="text-sm uppercase tracking-[0.28em] text-[#ffb48a]">
+                Onboarding flow
+              </p>
+              <h2 className="mt-4 max-w-md text-4xl font-bold leading-tight sm:text-5xl">
+                The first release should feel obvious in under a minute.
+              </h2>
+              <p className="mt-5 max-w-md text-base leading-7 text-[#bfb8d3]">
+                The experience is built around one job: get creators from account
+                creation to a submitted order with confidence and visible progress.
+              </p>
+            </div>
+
+            <div className="grid gap-5">
+              {releaseSteps.map((item, index) => (
+                <Surface
+                  key={item.step}
+                  className={cn(
+                    "reveal-up grid gap-5 p-6 sm:p-7 md:grid-cols-[96px_1fr]",
+                    index % 2 === 1 && "md:translate-x-10"
+                  )}
+                >
+                  <div className="flex items-center justify-between md:block">
+                    <span className="font-display text-5xl font-bold text-white/14">
+                      {item.step}
+                    </span>
+                    <item.icon className="h-8 w-8 text-[#ff1b6b]" />
                   </div>
-                )}
-                <CardContent className="p-8">
-                  <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                  <div className="text-4xl font-bold text-[#FF1B6B] mb-6">
-                    {plan.price}
-                    <span className="text-sm text-gray-400">/one-time</span>
+                  <div>
+                    <h3 className="text-2xl font-bold">{item.title}</h3>
+                    <p className="mt-3 max-w-2xl text-base leading-7 text-[#bfb8d3]">
+                      {item.copy}
+                    </p>
                   </div>
-                  <ul className="space-y-3 mb-8 text-left">
-                    {plan.features.map((feature, j) => (
-                      <li key={j} className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-[#FF1B6B] flex-shrink-0 mt-0.5" />
-                        <span className="text-sm text-gray-300">{feature}</span>
+                </Surface>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="why-us" className="px-5 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <Surface className="overflow-hidden p-7 sm:p-8">
+            <div className="flex items-center gap-3 text-[#ffb48a]">
+              <Disc3 className="h-5 w-5" />
+              <p className="text-sm uppercase tracking-[0.26em]">Why creators stick</p>
+            </div>
+            <h2 className="mt-4 max-w-xl text-4xl font-bold leading-tight">
+              Modern enough to feel alive. Clear enough to trust with money and music.
+            </h2>
+            <div className="mt-8 grid gap-8 lg:grid-cols-2">
+              {advantageColumns.map((column) => (
+                <div key={column.eyebrow}>
+                  <p className="text-sm uppercase tracking-[0.22em] text-[#a7a0ba]">
+                    {column.eyebrow}
+                  </p>
+                  <h3 className="mt-3 text-2xl font-bold leading-tight">
+                    {column.title}
+                  </h3>
+                  <ul className="mt-5 space-y-3 text-sm leading-7 text-[#c8c2d8]">
+                    {column.points.map((point) => (
+                      <li key={point} className="flex items-start gap-3">
+                        <Check className="mt-1 h-4 w-4 flex-shrink-0 text-[#ff1b6b]" />
+                        <span>{point}</span>
                       </li>
                     ))}
                   </ul>
-                  <Button
-                    className={`w-full ${
-                      plan.popular
-                        ? "bg-[#FF1B6B] hover:bg-[#FF1B6B]/90"
-                        : "bg-white/10 hover:bg-white/20"
-                    }`}
-                  >
-                    Get Started
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+                </div>
+              ))}
+            </div>
+          </Surface>
 
-      <section id="features" className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center">
-            From <span className="text-[#FF1B6B]">Distribution</span> Works
-          </h2>
-          <p className="text-gray-400 mb-12 text-center max-w-2xl mx-auto">
-            Everything you need to succeed in the music industry, all in one
-            place.
-          </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                icon: Zap,
-                title: "Instant Distribution",
-                desc: "Your music goes live within 24-48 hours across all platforms",
-              },
-              {
-                icon: Shield,
-                title: "100% Rights Ownership",
-                desc: "You own all rights to your music. Forever.",
-              },
-              {
-                icon: BarChart3,
-                title: "Real-Time Analytics",
-                desc: "Track streams, earnings, and audience insights in real-time",
-              },
-              {
-                icon: DollarSign,
-                title: "Direct Payments",
-                desc: "Get paid directly from platforms. No middleman.",
-              },
-              {
-                icon: Globe,
-                title: "Global Reach",
-                desc: "Distribute to 150+ platforms and territories worldwide",
-              },
-              {
-                icon: Users,
-                title: "Artist Support",
-                desc: "24/7 support from real people who care about your success",
-              },
-              {
-                icon: Crown,
-                title: "No Hidden Fees",
-                desc: "What you see is what you pay. No surprises.",
-              },
-              {
-                icon: Star,
-                title: "Pre-Save Campaigns",
-                desc: "Build hype with pre-save links before release",
-              },
-              {
-                icon: Calendar,
-                title: "Release Scheduling",
-                desc: "Plan and schedule releases in advance",
-              },
-            ].map((feature, i) => (
-              <Card
-                key={i}
-                className="bg-white/5 border-white/10 hover:border-[#FF1B6B] transition-all hover:scale-105 group"
-              >
-                <CardContent className="p-6">
-                  <feature.icon className="h-10 w-10 text-[#FF1B6B] mb-4 group-hover:scale-110 transition-transform" />
-                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                  <p className="text-gray-400 text-sm">{feature.desc}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+          <div className="grid gap-6">
+            <Surface className="p-6 sm:p-7">
+              <p className="text-sm uppercase tracking-[0.22em] text-[#a7a0ba]">
+                Built-in trust
+              </p>
+              <div className="mt-5 flex items-start gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ff1b6b]/12">
+                  <ShieldCheck className="h-6 w-6 text-[#ff1b6b]" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">Rights stay with the artist</h3>
+                  <p className="mt-2 text-sm leading-7 text-[#c8c2d8]">
+                    The value proposition is simple: pay once, distribute the release,
+                    and keep ownership visible in the story and interface.
+                  </p>
+                </div>
+              </div>
+            </Surface>
 
-      <section className="py-20 px-6 bg-gradient-to-b from-[#FF1B6B]/5 to-transparent">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Everything <span className="text-[#FF1B6B]">You Need</span>
-          </h2>
-          <p className="text-gray-400 mb-12 max-w-2xl mx-auto">
-            Professional tools for independent artists
-          </p>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Radio,
-                title: "Radio Promotion",
-                desc: "Get your tracks played on internet radio stations",
-                color: "#FF6B35",
-              },
-              {
-                icon: Disc3,
-                title: "Playlist Pitching",
-                desc: "Submit your music to curated playlists",
-                color: "#FF1B6B",
-              },
-              {
-                icon: TrendingUp,
-                title: "Growth Tools",
-                desc: "Analytics and insights to grow your audience",
-                color: "#00D9FF",
-              },
-            ].map((item, i) => (
-              <Card
-                key={i}
-                className="bg-white/5 border-white/10 hover:border-[#FF1B6B] transition-all hover:scale-105"
-              >
-                <CardContent className="p-8 text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#FF1B6B]/20 mb-4">
-                    <item.icon
-                      className="h-8 w-8"
-                      style={{ color: item.color }}
-                    />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                  <p className="text-gray-400 text-sm">{item.desc}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center">
-            What <span className="text-[#FF1B6B]">Artists Say</span>
-          </h2>
-          <p className="text-gray-400 mb-12 text-center max-w-2xl mx-auto">
-            Join thousands of artists who trust us with their music
-          </p>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                name: "Priya Sharma",
-                role: "Independent Artist",
-                rating: 5,
-                text: "Best decision I made for my music career. Distribution was instant and support was amazing!",
-              },
-              {
-                name: "Rahul Verma",
-                role: "Producer",
-                rating: 5,
-                text: "Finally, a platform that respects artists. No hidden fees, just pure distribution.",
-              },
-              {
-                name: "Ananya Kapoor",
-                role: "Singer-Songwriter",
-                rating: 5,
-                text: "The analytics dashboard is incredible. I can see exactly where my fans are listening.",
-              },
-            ].map((testimonial, i) => (
-              <Card
-                key={i}
-                className="bg-white/5 border-white/10 hover:border-[#FF1B6B] transition-all hover:scale-105"
-              >
-                <CardContent className="p-6">
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(testimonial.rating)].map((_, j) => (
-                      <Star
-                        key={j}
-                        className="h-4 w-4 fill-[#FF1B6B] text-[#FF1B6B]"
-                      />
-                    ))}
-                  </div>
-                  <p className="text-gray-300 mb-4">{testimonial.text}</p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#FF1B6B]/20 flex items-center justify-center">
-                      <Music className="h-5 w-5 text-[#FF1B6B]" />
+            <Surface className="p-6 sm:p-7">
+              <p className="text-sm uppercase tracking-[0.22em] text-[#a7a0ba]">
+                Status visibility
+              </p>
+              <div className="mt-6 space-y-4">
+                {[
+                  "Upload received",
+                  "Payment matched",
+                  "Review in progress",
+                  "Sent to platforms",
+                ].map((item, index) => (
+                  <div key={item} className="flex items-center gap-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xs font-semibold text-white">
+                      {index + 1}
                     </div>
-                    <div>
-                      <p className="font-bold text-sm">{testimonial.name}</p>
-                      <p className="text-xs text-gray-400">
-                        {testimonial.role}
-                      </p>
-                    </div>
+                    <div className="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent" />
+                    <span className="text-sm text-[#d7d0e7]">{item}</span>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                ))}
+              </div>
+            </Surface>
           </div>
         </div>
       </section>
 
-      <section className="py-20 px-6 bg-gradient-to-b from-transparent to-[#FF1B6B]/5">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center">
-            Manage Your <span className="text-[#FF1B6B]">Releases</span>
-          </h2>
-          <p className="text-gray-400 mb-12 text-center">
-            Simple dashboard to manage all your music in one place
-          </p>
-          <div className="grid md:grid-cols-2 gap-6">
-            {[
-              {
-                icon: FileText,
-                title: "Upload & Release",
-                desc: "Simple upload process with all the tools you need",
-              },
-              {
-                icon: BarChart3,
-                title: "Track Performance",
-                desc: "See how your music performs across all platforms",
-              },
-              {
-                icon: Calendar,
-                title: "Schedule Releases",
-                desc: "Plan your releases weeks or months in advance",
-              },
-              {
-                icon: MessageSquare,
-                title: "Fan Engagement",
-                desc: "Connect with your fans through integrated tools",
-              },
-            ].map((item, i) => (
-              <Card
-                key={i}
-                className="bg-white/5 border-white/10 hover:border-[#FF1B6B] transition-all hover:scale-105"
-              >
-                <CardContent className="p-6 flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-[#FF1B6B]/20 flex items-center justify-center flex-shrink-0">
-                    <item.icon className="h-6 w-6 text-[#FF1B6B]" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold mb-1">{item.title}</h3>
-                    <p className="text-gray-400 text-sm">{item.desc}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+      <section className="px-5 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <div className="mx-auto max-w-7xl">
+          <Surface className="grid gap-8 overflow-hidden p-7 sm:p-8 lg:grid-cols-[0.92fr_1.08fr]">
+            <div>
+              <p className="text-sm uppercase tracking-[0.26em] text-[#ffb48a]">
+                Aha moment
+              </p>
+              <h2 className="mt-4 max-w-lg text-4xl font-bold leading-tight">
+                The colors and microinteractions should make the platform feel like a release booth, not a form dump.
+              </h2>
+              <p className="mt-5 max-w-lg text-base leading-7 text-[#bfb8d3]">
+                That means focused highlights, tactile buttons, and enough movement to
+                make status and action feel alive, while still respecting reduced-motion
+                settings and keeping the path to payment obvious.
+              </p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {[
+                {
+                  icon: Headphones,
+                  title: "Feedback with restraint",
+                  text: "Hover, press, and focus states are quick and legible instead of flashy for the sake of it.",
+                },
+                {
+                  icon: Music2,
+                  title: "Color with a job",
+                  text: "Pink carries urgency and release energy, amber supports highlights, and the dark field keeps them readable.",
+                },
+                {
+                  icon: BadgeCheck,
+                  title: "Onboarding in the UI",
+                  text: "The homepage now teaches the core release path instead of burying it under generic marketing claims.",
+                },
+                {
+                  icon: Sparkles,
+                  title: "Gen Z, not gimmick",
+                  text: "The tone stays modern and music-adjacent without turning into neon gamer UI or AI-generated gloss.",
+                },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className="rounded-[24px] border border-white/8 bg-black/20 p-5 hover:-translate-y-1 hover:border-white/14"
+                >
+                  <item.icon className="h-6 w-6 text-[#ff1b6b]" />
+                  <h3 className="mt-4 text-lg font-bold">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-[#c8c2d8]">{item.text}</p>
+                </div>
+              ))}
+            </div>
+          </Surface>
+        </div>
+      </section>
+
+      <section id="faq" className="px-5 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <div className="mx-auto max-w-3xl">
+          <div className="text-center">
+            <p className="text-sm uppercase tracking-[0.28em] text-[#ffb48a]">
+              FAQ
+            </p>
+            <h2 className="mt-4 text-4xl font-bold sm:text-5xl">
+              The questions artists ask before they hit upload.
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#bfb8d3]">
+              Clear answers matter more than filler copy when money, rights, and release
+              timing are involved.
+            </p>
           </div>
-        </div>
-      </section>
 
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center">
-            Reports & <span className="text-[#FF1B6B]">Payments</span>
-          </h2>
-          <p className="text-gray-400 mb-12 text-center">
-            Transparent reporting and fast payments
-          </p>
-          <div className="grid md:grid-cols-2 gap-6">
-            {[
-              {
-                icon: DollarSign,
-                title: "Monthly Payments",
-                desc: "Receive your earnings every month, directly to your bank account",
-              },
-              {
-                icon: BarChart3,
-                title: "Detailed Reports",
-                desc: "See exactly where your earnings come from, platform by platform",
-              },
-            ].map((item, i) => (
-              <Card
-                key={i}
-                className="bg-white/5 border-white/10 hover:border-[#FF1B6B] transition-all hover:scale-105"
-              >
-                <CardContent className="p-6 flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-[#FF1B6B]/20 flex items-center justify-center flex-shrink-0">
-                    <item.icon className="h-6 w-6 text-[#FF1B6B]" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold mb-1">{item.title}</h3>
-                    <p className="text-gray-400 text-sm">{item.desc}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="support"
-        className="py-20 px-6 bg-gradient-to-b from-[#FF1B6B]/5 to-transparent"
-      >
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center">
-            Support <span className="text-[#FF1B6B]">Center</span>
-          </h2>
-          <p className="text-gray-400 mb-12 text-center">
-            We're here to help you succeed
-          </p>
-          <div className="grid md:grid-cols-2 gap-6">
-            {[
-              {
-                icon: HeadphonesIcon,
-                title: "24/7 Support",
-                desc: "Get help whenever you need it from our dedicated support team",
-              },
-              {
-                icon: FileText,
-                title: "Knowledge Base",
-                desc: "Comprehensive guides and tutorials to help you get started",
-              },
-            ].map((item, i) => (
-              <Card
-                key={i}
-                className="bg-white/5 border-white/10 hover:border-[#FF1B6B] transition-all hover:scale-105"
-              >
-                <CardContent className="p-6 flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-[#FF1B6B]/20 flex items-center justify-center flex-shrink-0">
-                    <item.icon className="h-6 w-6 text-[#FF1B6B]" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold mb-1">{item.title}</h3>
-                    <p className="text-gray-400 text-sm">{item.desc}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Invite Fellow <span className="text-[#FF1B6B]">Artists</span>
-          </h2>
-          <p className="text-gray-400 mb-8">
-            Know someone who needs this? Share the love and help them grow their
-            music career.
-          </p>
-          <Button size="lg" className="bg-[#FF1B6B] hover:bg-[#FF1B6B]/90">
-            Share Invite Link
-          </Button>
-        </div>
-      </section>
-
-      <section
-        id="faq"
-        className="py-20 px-6 bg-gradient-to-b from-transparent to-[#FF1B6B]/5"
-      >
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center">
-            Frequently Asked <span className="text-[#FF1B6B]">Questions</span>
-          </h2>
-          <p className="text-gray-400 mb-12 text-center">
-            Got questions? We've got answers.
-          </p>
-          <Accordion type="single" collapsible className="space-y-4">
-            {[
-              {
-                q: "How long does distribution take?",
-                a: "Your music typically goes live within 24-48 hours on most platforms. Some platforms may take up to 5-7 days.",
-              },
-              {
-                q: "Do I keep the rights to my music?",
-                a: "Absolutely! You retain 100% ownership of your music and all rights. We simply distribute it for you.",
-              },
-              {
-                q: "Can I distribute cover songs?",
-                a: "Yes! We handle mechanical licensing for cover songs. Additional fees may apply based on the platform.",
-              },
-              {
-                q: "How do I get paid?",
-                a: "We collect royalties from all platforms and pay you monthly via bank transfer. No minimum payout threshold.",
-              },
-              {
-                q: "Can I remove my music later?",
-                a: "Yes, you can take down your music anytime from your dashboard. It typically takes 24-48 hours to process.",
-              },
-              {
-                q: "What formats do you accept?",
-                a: "We accept WAV, FLAC, and high-quality MP3 files. Album artwork should be at least 3000x3000px in JPG or PNG format.",
-              },
-            ].map((faq, i) => (
+          <Accordion type="single" collapsible className="mt-10 space-y-4">
+            {faqs.map((faq, index) => (
               <AccordionItem
-                key={i}
-                value={`item-${i}`}
-                className="bg-white/5 border-white/10 rounded-lg px-6"
+                key={faq.q}
+                value={`item-${index}`}
+                className="rounded-[24px] border border-white/8 bg-white/[0.03] px-6"
               >
-                <AccordionTrigger className="hover:text-[#FF1B6B] text-left">
+                <AccordionTrigger className="text-left text-base font-medium text-white hover:text-[#ffb48a]">
                   {faq.q}
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-400">
+                <AccordionContent className="pb-6 text-sm leading-7 text-[#c8c2d8]">
                   {faq.a}
                 </AccordionContent>
               </AccordionItem>
@@ -695,147 +559,45 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center bg-gradient-to-br from-[#FF1B6B]/20 to-transparent rounded-3xl p-12 border border-[#FF1B6B]/30">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Ready, In <span className="text-[#FF1B6B]">Demand?</span>
-          </h2>
-          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-            Join thousands of independent artists who are taking control of
-            their music career. Start distributing today.
-          </p>
-          <Button
-            size="lg"
-            className="bg-[#FF1B6B] hover:bg-[#FF1B6B]/90 text-white group"
-          >
-            Start Your Journey
-            <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-          </Button>
-        </div>
-      </section>
-
-      <footer className="border-t border-white/10 py-12 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Music2 className="h-6 w-6 text-[#FF1B6B]" />
-                <span className="text-lg font-bold">VibeIndia</span>
-              </div>
-              <p className="text-sm text-gray-400">
-                Empowering independent artists to share their music with the
-                world.
+      <section className="px-5 pb-20 pt-10 sm:px-6 lg:px-8 lg:pb-28">
+        <div className="mx-auto max-w-5xl">
+          <Surface className="overflow-hidden px-7 py-10 text-center sm:px-10 sm:py-12">
+            <div className="mx-auto max-w-3xl">
+              <p className="text-sm uppercase tracking-[0.28em] text-[#ffb48a]">
+                Start the drop
+              </p>
+              <h2 className="mt-4 text-4xl font-bold sm:text-5xl">
+                Bring the track, the artwork, and the intent. We handle the release path.
+              </h2>
+              <p className="mt-5 text-base leading-7 text-[#c8c2d8] sm:text-lg">
+                Create the order, upload the assets, pay once, and keep your eye on the
+                status from dashboard to distribution.
               </p>
             </div>
-            <div>
-              <h3 className="font-bold mb-4">Product</h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-[#FF1B6B] transition-colors"
-                  >
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-[#FF1B6B] transition-colors"
-                  >
-                    Pricing
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-[#FF1B6B] transition-colors"
-                  >
-                    Distribution
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-[#FF1B6B] transition-colors"
-                  >
-                    Analytics
-                  </a>
-                </li>
-              </ul>
+
+            <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+              <Button
+                asChild
+                size="lg"
+                className="h-14 bg-[#ff1b6b] px-7 text-base font-semibold text-white shadow-[0_20px_50px_rgba(255,27,107,0.3)] hover:-translate-y-0.5 hover:bg-[#ff1b6b]/92"
+              >
+                <Link href="/sign-up">
+                  Get started
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="h-14 border-white/12 bg-white/5 px-7 text-base text-white hover:-translate-y-0.5 hover:bg-white/10"
+              >
+                <Link href="/sign-in">Already have an account</Link>
+              </Button>
             </div>
-            <div>
-              <h3 className="font-bold mb-4">Company</h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-[#FF1B6B] transition-colors"
-                  >
-                    About
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-[#FF1B6B] transition-colors"
-                  >
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-[#FF1B6B] transition-colors"
-                  >
-                    Careers
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-[#FF1B6B] transition-colors"
-                  >
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Legal</h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-[#FF1B6B] transition-colors"
-                  >
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-[#FF1B6B] transition-colors"
-                  >
-                    Terms of Service
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-[#FF1B6B] transition-colors"
-                  >
-                    Cookie Policy
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="pt-8 border-t border-white/10 text-center text-sm text-gray-400">
-            <p>&copy; 2026 VibeIndia. All rights reserved.</p>
-          </div>
+          </Surface>
         </div>
-      </footer>
+      </section>
     </main>
   );
 }
