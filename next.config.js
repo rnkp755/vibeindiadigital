@@ -4,9 +4,7 @@ const nextConfig = {
 		ignoreDuringBuilds: true,
 	},
 	images: { unoptimized: true },
-	experimental: {
-		serverComponentsExternalPackages: ["tesseract.js"],
-	},
+	serverExternalPackages: ["tesseract.js"],
 };
 
 module.exports = nextConfig;
