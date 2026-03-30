@@ -8,11 +8,61 @@ import {
 	sendPaymentReviewEmail,
 	sendPaymentConfirmedEmail,
 } from "@/lib/mailer";
-import { createWorker } from "tesseract.js";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 60;
+
+// ─── OCR via OCR.space API ────────────────────────────────────────────────────
+// Tesseract.js cannot run on Vercel — Next.js bundles its worker and rewrites
+// paths into .next/worker-script/... which breaks worker_threads resolution.
+// OCR.space is a free HTTP API (500 req/day free tier) that accepts a URL
+// directly, so we just pass the Cloudinary URL — no file handling needed.
+// Get a free key at: https://ocr.space/ocrapi/freekey
+async function runOcr(imageUrl: string): Promise<string> {
+	const apiKey = process.env.OCR_SPACE_API_KEY;
+	if (!apiKey) {
+		console.error("[Verify] OCR_SPACE_API_KEY is not set");
+		return "";
+	}
+
+	try {
+		const form = new FormData();
+		form.append("url", imageUrl);
+		form.append("language", "eng");
+		form.append("isOverlayRequired", "false");
+		form.append("detectOrientation", "true");
+		form.append("scale", "true");
+		form.append("OCREngine", "2"); // Engine 2 is better for printed/screenshot text
+
+		const res = await fetch("https://api.ocr.space/parse/image", {
+			method: "POST",
+			headers: { apikey: apiKey },
+			body: form,
+		});
+
+		if (!res.ok) {
+			throw new Error(`OCR.space responded with HTTP ${res.status}`);
+		}
+
+		const json = (await res.json()) as {
+			IsErroredOnProcessing: boolean;
+			ErrorMessage?: string[];
+			ParsedResults?: { ParsedText: string }[];
+		};
+
+		if (json.IsErroredOnProcessing) {
+			throw new Error(
+				json.ErrorMessage?.join(", ") ?? "OCR processing error",
+			);
+		}
+
+		return json.ParsedResults?.[0]?.ParsedText ?? "";
+	} catch (err) {
+		console.error("[Verify] OCR.space failed:", err);
+		return "";
+	}
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -136,34 +186,8 @@ export async function POST(
 	}
 
 	// ── OCR the screenshot ─────────────────────────────────────────────────────
-	let extractedText = "";
-
-	try {
-		const imageRes = await fetch(screenshotUrl);
-		if (!imageRes.ok) {
-			throw new Error(
-				`Failed to fetch screenshot (HTTP ${imageRes.status})`,
-			);
-		}
-
-		const arrayBuffer = await imageRes.arrayBuffer();
-		const imageBuffer = Buffer.from(arrayBuffer);
-
-		// createWorker is used instead of Tesseract.recognize() so that Next.js
-		// (with serverExternalPackages: ["tesseract.js"] in next.config) can load
-		// the worker correctly without bundling it — works on both local and Vercel.
-		const worker = await createWorker("eng");
-		try {
-			const { data } = await worker.recognize(imageBuffer);
-			extractedText = data.text;
-		} finally {
-			await worker.terminate();
-		}
-	} catch (err) {
-		console.error("[Verify] Tesseract OCR failed:", err);
-		// Don't return — treat as needs_review so admin can check manually
-		extractedText = "";
-	}
+	// screenshotUrl is already on Cloudinary — pass it directly to OCR.space.
+	const extractedText = await runOcr(screenshotUrl);
 
 	// ── Determine verification outcome ────────────────────────────────────────
 	const amounts = extractAmounts(extractedText);
