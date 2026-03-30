@@ -72,6 +72,7 @@
 		"react-hook-form": "^7.53.0",
 		"react-resizable-panels": "^2.1.3",
 		"recharts": "^2.12.7",
+		"scribe.js-ocr": "^0.10.1",
 		"sonner": "^1.5.0",
 		"svix": "^1.89.0",
 		"tailwind-merge": "^2.5.2",

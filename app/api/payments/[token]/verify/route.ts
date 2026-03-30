@@ -8,6 +8,8 @@ import {
 	sendPaymentReviewEmail,
 	sendPaymentConfirmedEmail,
 } from "@/lib/mailer";
+// @ts-ignore
+import scribe from "scribe.js-ocr";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -20,44 +22,10 @@ export const maxDuration = 60;
 // directly, so we just pass the Cloudinary URL — no file handling needed.
 // Get a free key at: https://ocr.space/ocrapi/freekey
 async function runOcr(imageUrl: string): Promise<string> {
-	const apiKey = process.env.OCR_SPACE_API_KEY;
-	if (!apiKey) {
-		console.error("[Verify] OCR_SPACE_API_KEY is not set");
-		return "";
-	}
-
 	try {
-		const form = new FormData();
-		form.append("url", imageUrl);
-		form.append("language", "eng");
-		form.append("isOverlayRequired", "false");
-		form.append("detectOrientation", "true");
-		form.append("scale", "true");
-		form.append("OCREngine", "2"); // Engine 2 is better for printed/screenshot text
+		const result = await scribe.extractText([imageUrl]);
 
-		const res = await fetch("https://api.ocr.space/parse/image", {
-			method: "POST",
-			headers: { apikey: apiKey },
-			body: form,
-		});
-
-		if (!res.ok) {
-			throw new Error(`OCR.space responded with HTTP ${res.status}`);
-		}
-
-		const json = (await res.json()) as {
-			IsErroredOnProcessing: boolean;
-			ErrorMessage?: string[];
-			ParsedResults?: { ParsedText: string }[];
-		};
-
-		if (json.IsErroredOnProcessing) {
-			throw new Error(
-				json.ErrorMessage?.join(", ") ?? "OCR processing error",
-			);
-		}
-
-		return json.ParsedResults?.[0]?.ParsedText ?? "";
+		return result ?? "";
 	} catch (err) {
 		console.error("[Verify] OCR.space failed:", err);
 		return "";

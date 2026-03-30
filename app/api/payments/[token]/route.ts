@@ -228,6 +228,56 @@ export async function PATCH(
         });
 
         payment.credits_granted = creditsToAdd;
+
+        // ── Auto-activate unpaid order if possible ─────────────────────────────
+        try {
+          const newCredits = currentCredits + creditsToAdd;
+
+          // Find the last unpaid order for this user
+          const lastUnpaidOrder = await Order.findOne({
+            user_id: clerkUser.id,
+            current_status: {
+              $elemMatch: { status: "unpaid" },
+            },
+          })
+            .sort({ createdAt: -1 })
+            .exec();
+
+          if (lastUnpaidOrder) {
+            // Determine the latest status entry
+            const latestStatus =
+              lastUnpaidOrder.current_status[
+                lastUnpaidOrder.current_status.length - 1
+              ]?.status;
+
+            if (
+              latestStatus === "unpaid" &&
+              lastUnpaidOrder.tracks <= newCredits
+            ) {
+              // Activate the order and deduct credits atomically
+              lastUnpaidOrder.current_status.push({
+                status: "pending",
+                updated_at: new Date(),
+              });
+              await lastUnpaidOrder.save();
+
+              // Deduct tracks from the newly updated credit balance
+              const creditsAfterOrder = newCredits - lastUnpaidOrder.tracks;
+              await client.users.updateUserMetadata(clerkUser.id, {
+                publicMetadata: {
+                  credits: creditsAfterOrder,
+                },
+              });
+            }
+          }
+        } catch (err) {
+          // Non-critical: log and continue
+          console.error(
+            "[PATCH /api/payments/:token] Failed to auto-activate unpaid order for user:",
+            clerkUser.id,
+            err,
+          );
+        }
       }
     } catch (err) {
       console.error(
