@@ -17,6 +17,7 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useNavigation } from "@/components/NavigationProvider";
 
 interface DashboardNavbarProps {
   /** SSR-resolved credits (used as initial value before client hydration) */
@@ -53,6 +54,7 @@ export function DashboardNavbar({
   const pathname = usePathname();
   const { user, isLoaded } = useUser();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { startNavigation } = useNavigation();
 
   // Prefer live Clerk data once hydrated, fall back to SSR props
   const credits: number = isLoaded
@@ -80,6 +82,7 @@ export function DashboardNavbar({
           <Link
             href="/dashboard"
             className="flex items-center gap-2 shrink-0 group"
+            onClick={startNavigation}
           >
             <div className="w-8 h-8 rounded-lg bg-[#FF1B6B]/20 border border-[#FF1B6B]/30 flex items-center justify-center group-hover:bg-[#FF1B6B]/30 transition-colors">
               <Music2 className="h-4 w-4 text-[#FF1B6B]" />
@@ -101,6 +104,7 @@ export function DashboardNavbar({
                 <Link
                   key={href}
                   href={href}
+                  onClick={startNavigation}
                   className={cn(
                     "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-150",
                     active
@@ -117,6 +121,7 @@ export function DashboardNavbar({
             {isAdmin && (
               <Link
                 href="/admin"
+                onClick={startNavigation}
                 className={cn(
                   "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-150",
                   pathname.startsWith("/admin")
@@ -243,7 +248,10 @@ export function DashboardNavbar({
                   <Link
                     key={href}
                     href={href}
-                    onClick={() => setMobileOpen(false)}
+                    onClick={() => {
+                      setMobileOpen(false);
+                      startNavigation();
+                    }}
                     className={cn(
                       "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                       active
@@ -260,7 +268,10 @@ export function DashboardNavbar({
               {isAdmin && (
                 <Link
                   href="/admin"
-                  onClick={() => setMobileOpen(false)}
+                  onClick={() => {
+                    setMobileOpen(false);
+                    startNavigation();
+                  }}
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                     pathname.startsWith("/admin")

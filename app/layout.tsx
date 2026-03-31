@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { DM_Sans, Space_Grotesk } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { CustomCursor } from "@/components/custom-cursor";
+import { NavigationLoader } from "@/components/NavigationLoader";
+import { NavigationProvider } from "@/components/NavigationProvider";
 
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-body" });
 const spaceGrotesk = Space_Grotesk({
@@ -34,7 +36,8 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<ClerkProvider
+		<NavigationProvider>
+			<ClerkProvider
 			appearance={{
 				variables: {
 					colorPrimary: "#FF1B6B",
@@ -83,10 +86,12 @@ export default function RootLayout({
 				<body
 					className={`${dmSans.variable} ${spaceGrotesk.variable} bg-[#0a0a0a] text-white antialiased`}
 				>
+					<NavigationLoader />
 					{children}
 					<CustomCursor />
 				</body>
 			</html>
 		</ClerkProvider>
+		</NavigationProvider>
 	);
 }
